@@ -6,22 +6,38 @@
 # @source 
 # ------------------------------------------------------------------------------
 sshport=22;
-#Check that user is root.
-if [ “$(id -u)” = “0” ]; then
-printf "Bingo! you are root. Continue on....\n"
-  else
-printf "Sorry, This script must be run as root\n"
-exit;
+# Check that user is root.
+if [ "$(id -u)" = "0" ]; then
+    printf "Bingo! you are root. Continue on....\n"
+else
+    printf "Sorry, This script must be run as root\n"
+    exit 1
 fi
-#What Distro are you on?
+
+# What Distro are you on?
 printf "Distro are you on??\n" 2>&1
-OS='cat /etc/redhat-release | awk {'print $1}'
+OS=$(cat /etc/redhat-release | awk '{print $1}')
 if [ "$OS" = "CentOS" ]; then
-echo "System runs on CentOS 7.X. Checking Continue on....";
-VN='cat /etc/redhat-release | awk {'print $3}'
-else [ "$VN" != "7.*" ]; elseif
-echo "Installation failed. System runs on unsupported Linux. Exiting...";
-exit;
+    echo "System runs on CentOS. Checking version..."
+    VN=$(cat /etc/redhat-release | awk '{print $3}')
+    if [[ "$VN" != 7.* ]]; then
+        echo "Installation failed. System runs on unsupported CentOS version. Exiting..."
+        exit 1
+    else
+        echo "System runs on CentOS 7.X. Continuing..."
+    fi
+else
+    echo "Installation failed. System runs on unsupported Linux distribution. Exiting..."
+    exit 1
+fi
+
+if [ "$#" -ne 3 ]; then
+    echo "Usage: $0 <username> <userpass> <master ip>"
+    exit 1
+fi
+
+echo "Saving most outputs to /root/install.log"
+
 fi 
 if [ -z "$1" ]; then
  echo "usage <username> <userpass> <master ip>";
